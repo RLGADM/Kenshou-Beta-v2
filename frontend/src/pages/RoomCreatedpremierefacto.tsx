@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { useRoomCreatedMain } from '../hooks/roomcreated';
 
-// --------------- Composant RoomCreated refactorisé
+// --------------- Composant RoomCreated refactorisé //
 const RoomCreated: React.FC = () => {
   // Hook principal qui gère toute la logique
   const {

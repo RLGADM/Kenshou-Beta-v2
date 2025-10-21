@@ -36,14 +36,14 @@ export function useRoomSocketListeners({ socket, isConnected, setGameState, onEr
     };
 
     // === Listeners ===
-    socket.on('updateGameState', handleGameStateUpdate);
+    socket.on('gameStateUpdate', handleGameStateUpdate);
     socket.on('roomError', handleRoomError);
     socket.on('roomNotFound', handleRoomNotFound);
     socket.on('roomFull', handleRoomFull);
 
     // Nettoyage à la destruction du composant
     return () => {
-      socket.off('updateGameState', handleGameStateUpdate);
+      socket.off('gameStateUpdate', handleGameStateUpdate);
       socket.off('roomError', handleRoomError);
       socket.off('roomNotFound', handleRoomNotFound);
       socket.off('roomFull', handleRoomFull);

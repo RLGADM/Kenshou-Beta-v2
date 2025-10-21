@@ -124,11 +124,14 @@ export function useRoomEvents() {
 
     const onUsersUpdate = (users: User[]) => {
       setRoomUsers(users);
+      // Alimente aussi l’objet currentRoom pour l’UI (compteur joueurs, filtres équipes/spectateurs)
+      setCurrentRoom((prev) => ({ ...prev, users }));
+  
       if (userToken) {
-        const self = getSelfFromUsers(users, userToken);
-        if (self) {
-          setCurrentUser((prev) => ({ ...prev, ...self }));
-        }
+          const self = getSelfFromUsers(users, userToken);
+          if (self) {
+              setCurrentUser((prev) => ({ ...prev, ...self }));
+          }
       }
     };
 

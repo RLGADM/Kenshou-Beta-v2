@@ -91,15 +91,18 @@ const RightColumn: React.FC<RightColumnProps> = ({
             <Crown className="w-4 h-4 mr-2 text-yellow-400" />
             Sage
           </h4>
-          {(!currentUser.team || currentUser.team === 'spectator') && (
-            <button
-              onClick={() => joinTeam('blue', 'sage')}
-              disabled={isJoiningTeam}
-              className="bg-yellow-500/20 hover:bg-yellow-500/40 text-yellow-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-yellow-300/30 hover:border-yellow-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
-            </button>
-          )}
+          {blueSage && ((blueSage.userToken ?? (blueSage as any).id) === (currentUser.userToken ?? (currentUser as any).id)) ? (
+              <span className="text-xs font-semibold text-yellow-300">C'est votre rôle</span>
+            ) : (
+              <button
+                onClick={() => joinTeam('blue', 'sage')}
+                disabled={isJoiningTeam || !!blueSage}
+                className="bg-yellow-500/20 hover:bg-yellow-500/40 text-yellow-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-yellow-300/30 hover:border-yellow-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isJoiningTeam ? 'En cours...' : (blueSage ? 'Rôle pris' : 'Rejoindre')}
+              </button>
+            )
+          }
         </div>
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
           {blueSage ? (
@@ -117,7 +120,7 @@ const RightColumn: React.FC<RightColumnProps> = ({
             <Users className="w-4 h-4 mr-2 text-blue-400" />
             Disciples
           </h4>
-          {(!currentUser.team || currentUser.team === 'spectator') && (
+          {(currentUser.team !== 'blue' || currentUser.role !== 'disciple') &&
             <button
               onClick={() => joinTeam('blue', 'disciple')}
               disabled={isJoiningTeam}
@@ -125,7 +128,7 @@ const RightColumn: React.FC<RightColumnProps> = ({
             >
               {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
             </button>
-          )}
+          }
         </div>
         <div className="space-y-3">
           {blueTeam.filter((u) => u.role === 'disciple').length === 0 ? (
@@ -359,15 +362,18 @@ const LeftColumn: React.FC<LeftColumnProps> = ({
             <Crown className="w-4 h-4 mr-2 text-yellow-400" />
             Sage
           </h4>
-          {(!currentUser.team || currentUser.team === 'spectator') && (
-            <button
-              onClick={() => joinTeam('red', 'sage')}
-              disabled={isJoiningTeam}
-              className="bg-yellow-500/20 hover:bg-yellow-500/40 text-yellow-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-yellow-300/30 hover:border-yellow-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
-            </button>
-          )}
+          {redSage && ((redSage.userToken ?? (redSage as any).id) === (currentUser.userToken ?? (currentUser as any).id)) ? (
+              <span className="text-xs font-semibold text-yellow-300">C'est votre rôle</span>
+            ) : (
+              <button
+                onClick={() => joinTeam('red', 'sage')}
+                disabled={isJoiningTeam || !!redSage}
+                className="bg-yellow-500/20 hover:bg-yellow-500/40 text-yellow-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-yellow-300/30 hover:border-yellow-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isJoiningTeam ? 'En cours...' : (redSage ? 'Rôle pris' : 'Rejoindre')}
+              </button>
+            )
+          }
         </div>
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
           {redSage ? (
@@ -385,7 +391,7 @@ const LeftColumn: React.FC<LeftColumnProps> = ({
             <Users className="w-4 h-4 mr-2 text-blue-400" />
             Disciples
           </h4>
-          {(!currentUser.team || currentUser.team === 'spectator') && (
+          {(currentUser.team !== 'red' || currentUser.role !== 'disciple') &&
             <button
               onClick={() => joinTeam('red', 'disciple')}
               disabled={isJoiningTeam}
@@ -393,7 +399,7 @@ const LeftColumn: React.FC<LeftColumnProps> = ({
             >
               {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
             </button>
-          )}
+          }
         </div>
         <div className="space-y-3">
           {redTeam.filter((u) => u.role === 'disciple').length === 0 ? (

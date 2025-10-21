@@ -16,29 +16,19 @@ const app = express();
 const server = createServer(app);
 
 //log initialement, mais on va le laisser ici
-const PORT = process.env.PORT || 3000;
-console.log(`Démarrage du serveur sur le port ${PORT}...`);
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-// --- CORS --- (ta logique corsOrigin/allowedOrigins ici)
+// --- CORS & JSON ---
 const allowedOrigins = [
   'http://localhost:5173',
   'https://localhost:5173',
   'https://kenshou-beta.netlify.app',
   'https://kenshou-beta-v2.onrender.com',
 ];
-
 app.use(cors({ origin: allowedOrigins, credentials: true }));
-app.use(express.json);
+app.use(express.json());
 
-// Crée l'instance Socket.IO AVANT toute utilisation de `io`
-const io = new Server(server, {
-  cors: {
-    origin: allowedOrigins,
-    credentials: true,
-  },
+// Route racine (aide la détection Render + check rapide)
+app.get('/', (req, res) => {
+  res.send('OK');
 });
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
@@ -725,3 +715,9 @@ function onPhaseEnd(roomCode) {
     io.to(roomCode).emit('gameStateUpdate', room.gameState);
   }
 }
+
+const PORT = process.env.PORT || 3000;
+console.log(`Démarrage du serveur sur le port ${PORT}...`);
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

@@ -32,26 +32,29 @@ export function useRoomTeamActions(
         }
       })();
 
-    if (!roomCode || !userToken) {
-      setTeamJoinError('Données utilisateur manquantes');
-      return;
-    }
-
     setIsJoiningTeam(true);
     setTeamJoinError(null);
 
     const normalizedRole = role ?? (team === 'spectator' ? 'spectator' : 'disciple');
 
-    socket.emit(
-      'joinTeam',
-      { roomCode, userToken, username, team, role: normalizedRole },
-      (resp: { success: boolean; message?: string }) => {
-        setIsJoiningTeam(false);
-        if (!resp?.success) {
-          setTeamJoinError(resp?.message || "Erreur lors de la jonction de l’équipe");
-        }
+    const ack = (resp: { success: boolean; message?: string }) => {
+      setIsJoiningTeam(false);
+      if (!resp?.success) {
+        setTeamJoinError(resp?.message || "Erreur lors de la jonction de l’équipe");
       }
-    );
+    };
+
+    // Fallback legacy si les données utilisateur sont manquantes:
+    // le serveur déduira roomCode et userToken via socket.id
+    if (!roomCode || !userToken) {
+      (socket as any).emit('joinTeam', team, normalizedRole, ack);
+    } else {
+      socket.emit(
+        'joinTeam',
+        { roomCode, userToken, username, team, role: normalizedRole },
+        ack
+      );
+    }
 
     setTimeout(() => {
       setIsJoiningTeam(false);

@@ -5,6 +5,7 @@
   "type": "module",
   "main": "src/server.js",
   "scripts": {
+    "start": "node .\\src\\server.js",
     "server:start": "node .\\src\\server.js",
     "server:dev": "nodemon --exec node .\\src\\server.js --watch .\\src --ext js,mjs,cjs"
   },

@@ -6,9 +6,9 @@
     "backend"
   ],
   "scripts": {
-    "frontend:dev": "cd frontend && npm run vite",
+    "frontend:dev": "cd frontend && npm run dev",
     "backend:dev": "cd backend && npm run server:dev",
-    "dev": "npm run frontend:dev && npm run backend:dev"
+    "dev": "concurrently \"npm run frontend:dev\" \"npm run backend:dev\""
   },
   "devDependencies": {
     "concurrently": "^8.2.0"

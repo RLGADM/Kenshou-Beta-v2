@@ -3,7 +3,7 @@ import { io, Socket } from 'socket.io-client';
 
 const SERVER_URL =
   import.meta.env.VITE_SERVER_URL ??
-  (import.meta.env.PROD ? 'https://kensho-hab0.onrender.com' : 'http://localhost:3000');
+  (import.meta.env.PROD ? 'https://kenshou-beta-v2.onrender.com' : 'http://localhost:3000');
 
 export function useSocket() {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -15,7 +15,6 @@ export function useSocket() {
     if (socket) return;
 
     const newSocket = io(SERVER_URL, {
-      // Robustesse en prod: polling d’abord, websocket ensuite
       transports: ['polling', 'websocket'],
       withCredentials: true,
       timeout: 20000,
@@ -25,6 +24,7 @@ export function useSocket() {
       reconnectionDelayMax: 5000,
       autoConnect: true,
       secure: SERVER_URL.startsWith('https'),
+      path: '/socket.io', // explicite pour les proxys
     });
 
     setSocket(newSocket);

@@ -15,7 +15,8 @@ export function useSocket() {
     if (socket) return;
 
     const newSocket = io(SERVER_URL, {
-      transports: ['websocket', 'polling'],
+      // Robustesse en prod: polling d’abord, websocket ensuite
+      transports: ['polling', 'websocket'],
       withCredentials: true,
       timeout: 20000,
       reconnection: true,
@@ -23,6 +24,7 @@ export function useSocket() {
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
       autoConnect: true,
+      secure: SERVER_URL.startsWith('https'),
     });
 
     setSocket(newSocket);
@@ -36,21 +38,21 @@ export function useSocket() {
 
     newSocket.on('disconnect', () => {
       setIsConnected(false);
-      setIsConnecting(false); // on pourrait garder true si tu veux attendre la reconnexion.
+      setIsConnecting(false);
     });
 
-    newSocket.on('connect_error', () => {
+    newSocket.on('connect_error', (err) => {
+      console.warn('Socket connect_error:', err?.message);
       setIsConnected(false);
       setIsConnecting(false);
     });
 
-    // Timeout de sécurité : si pas connecté après X sec, on considère que ça a échoué.
     connectTimeout.current = setTimeout(() => {
       if (!newSocket.connected) {
         console.warn('Socket connection timeout');
         setIsConnecting(false);
       }
-    }, 5000); // <-- tu peux ajuster ce délai
+    }, 10000);
 
     return () => {
       newSocket.close();

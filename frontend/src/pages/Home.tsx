@@ -8,8 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import GameConfigModal from '@/components/GameConfigModal';
 // Déclaration via hooks
 import { useHomeHandlers } from '@/hooks';
-// Import logo
-import logo from '@/assets/logo.png';
+// Import logo (chemin public pour éviter 404 en prod)
+const logo = '/logo.png';
 
 // Déclaration const
 

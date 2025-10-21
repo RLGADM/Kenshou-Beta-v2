@@ -26,7 +26,8 @@ import { useRoomCreatedMain } from '../hooks/roomcreated';
 import type { User } from '@/types';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import logo from '@/assets/logo.png'; // Ajout: import du logo
+// Chemin public pour le logo
+const logo = '/logo.png';
 
 // Déclaration const columns
 interface LeftColumnProps {

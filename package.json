@@ -1,0 +1,16 @@
+{
+  "name": "kensho-monorepo",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "frontend:dev": "cd frontend && npm run vite",
+    "backend:dev": "cd backend && npm run server:dev",
+    "dev": "npm run frontend:dev && npm run backend:dev"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}

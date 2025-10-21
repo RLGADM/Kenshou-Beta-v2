@@ -44,8 +44,7 @@ export function useRoomTeamActions(
       }
     };
 
-    // Fallback legacy si les données utilisateur sont manquantes:
-    // le serveur déduira roomCode et userToken via socket.id
+    // Fallback legacy si les données manquent: le serveur déduit via socket.id
     if (!roomCode || !userToken) {
       (socket as any).emit('joinTeam', team, normalizedRole, ack);
     } else {
@@ -65,8 +64,5 @@ export function useRoomTeamActions(
     joinTeam('spectator', 'spectator');
   };
 
-  return {
-    joinTeam,
-    joinSpectator,
-  };
+  return { joinTeam, joinSpectator };
 }

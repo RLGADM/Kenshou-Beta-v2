@@ -26,7 +26,12 @@ const allowedOrigins = [
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 
-// Route racine (aide la détection Render + check rapide)
+// Instanciation Socket.IO avant tout usage
+const io = new Server(server, {
+  cors: { origin: allowedOrigins, credentials: true },
+});
+
+// Route racine (check Render)
 app.get('/', (req, res) => {
   res.send('OK');
 });

@@ -331,8 +331,9 @@ io.on('connection', (socket) => {
     } else if (phaseBefore === 2) {
       startPhase(room.code, 3);
     } else if (!room.gameState.isPlaying) {
-      const duration = room.gameState.timeRemaining || getPhaseDuration(room.gameParameters, phaseBefore || 1);
-      startPhaseTimer(room.code, duration);
+      // Reprendre avec le total initial de la phase, pas avec le temps restant
+      const phaseTotal = room.gameState.totalTime || getPhaseDuration(room.gameParameters, phaseBefore || 1);
+      startPhaseTimer(room.code, phaseTotal);
     }
     console.log('[BACK] startGame processed', {
       phaseBefore,

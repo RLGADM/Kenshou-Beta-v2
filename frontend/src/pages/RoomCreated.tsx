@@ -28,8 +28,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 
 // --------------- Composant RoomCreated refactorisé
-// Dans le composant RoomCreated (déclaration des styles classiques)
-// Dans RoomCreated(), déclare les styles classiques pour cohérence
 function RoomCreated() {
   // intégration useParams et useState
   const { roomCode: routeRoomCode } = useParams();
@@ -57,18 +55,14 @@ function RoomCreated() {
     teamJoinError,
     isJoiningTeam,
     historyEndRef,
-    // initialisation des consts
-
     // Setters
     setProposal,
     setShowPlayersModal,
     setShowResetModal,
-
     // Utilitaires
     formatTime,
     formatTimer,
     getUserCardData,
-
     // Actions
     copyRoomLink,
     sendProposal,
@@ -78,7 +72,7 @@ function RoomCreated() {
     pauseGame,
     handleLeaveRoom,
     handleResetGame,
-    // Nouveaux pour modal pseudo
+    // Modal pseudo
     handleJoinRoom,
     socket,
   } = useRoomCreatedMain();
@@ -101,6 +95,9 @@ function RoomCreated() {
   const redTeam = currentRoom?.users?.filter((user: User) => user.team === 'red') ?? [];
   const blueTeam = currentRoom?.users?.filter((user: User) => user.team === 'blue') ?? [];
   const spectators = currentRoom?.users?.filter((user: User) => user.team === 'spectator') ?? [];
+  const redSage = redTeam.find((u: User) => u.role === 'sage');
+  const blueSage = blueTeam.find((u: User) => u.role === 'sage');
+
   // Modal: calcul du modal pseudo uniquement si nécessaire
   const storedUsername =
     localStorage.getItem('username') ||
@@ -112,13 +109,9 @@ function RoomCreated() {
         return '';
       }
     })();
-  // vérification si modal nécessaire
   const showUsernameModal =
     !storedUsername && !inRoom && !permissions.isAdmin && Boolean(routeRoomCode ?? currentRoom?.code);
 
-  // pré calcul
-  const redSage = redTeam.find((u: User) => u.role === 'sage');
-  const blueSage = blueTeam.find((u) => u.role === 'sage');
   // Fonction de rendu d'une carte utilisateur
   const renderUserCard = (user: User) => {
     const cardData = getUserCardData(user, currentUser.userToken);
@@ -145,11 +138,9 @@ function RoomCreated() {
     );
   };
 
-  // Déterminer l’affichage du modal pseudo
-
   return (
     <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 min-h-screen transition-all duration-1000">
-      {/* Modal pseudo (navigation privée / pas de username) */}
+      {/* Modal pseudo */}
       {showUsernameModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center">
           <div className="bg-white/90 rounded-2xl p-6 w-96 shadow-2xl">
@@ -169,7 +160,6 @@ function RoomCreated() {
               onClick={async () => {
                 const code = routeRoomCode ?? currentRoom?.code ?? '';
                 const name = tempUsername.trim();
-
                 if (!socket || !name || !code) return;
 
                 const success = await handleJoinRoom(socket, name, code);
@@ -186,14 +176,17 @@ function RoomCreated() {
           </div>
         </div>
       )}
-      {/* Animated Background Pattern */}
+
+      {/* Fond animé */}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22 fill-rule=%22evenodd%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%220.05%22%3E%3Cpath d=%22m36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2V6h4V4h-4zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] animate-pulse opacity-5 pointer-events-none"></div>
-      {/* Error Toast */}
+
+      {/* Erreur de join team */}
       {teamJoinError && (
         <div className="fixed top-4 right-4 z-50 bg-red-500 text-white px-6 py-3 rounded-xl shadow-lg">
           {teamJoinError}
         </div>
       )}
+
       {/* Header */}
       <header className="relative z-10 p-6">
         <div className="max-w-7xl mx-auto">
@@ -226,7 +219,7 @@ function RoomCreated() {
               </div>
             </div>
 
-            {/* Right Side - Actions */}
+            {/* Actions à droite */}
             <div className="flex items-center space-x-4">
               {permissions.canControlGame && (
                 <button
@@ -256,15 +249,15 @@ function RoomCreated() {
             </div>
           </div>
         </div>
-      {/* Status Bar */}
-      {/* Barre de statut: remplace les wrappers par le style classique */}
+      </header>
+
+      {/* Barre de statut */}
       {gameState && (
         <div className="relative z-10 px-6 mb-6">
           <div className="max-w-7xl mx-auto">
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-white/20">
               <div className="grid grid-cols-4 gap-4 items-center">
                 {/* Phase de jeu */}
-                {/* Colonne gauche et droite — remplacer sm:col-span-* par col-span-* pour la grille fixe */}
                 <div className="col-span-1">
                   <div className="bg-blue-500/20 backdrop-blur-sm rounded-xl p-3 border border-blue-300/30 text-center hover:bg-blue-500/30 transition-all duration-300">
                     <div className="flex items-center justify-center mb-2">
@@ -277,45 +270,19 @@ function RoomCreated() {
                       </button>
                       <span className="text-blue-200 text-sm font-semibold">Phase</span>
                     </div>
-                    {/* Dans la section "Phase de jeu" */}
                     <h3 className="text-white font-bold text-sm">
                       {currentPhaseIndex === 0 ? 'En attente' : `Phase ${currentPhaseIndex}`}
                     </h3>
                   </div>
                 </div>
-                {/* Temps restant */}
+                {/* Temps restant (affichage simple, sans barre de progression) */}
                 <div className="col-span-2">
                   <div className="bg-orange-500/20 backdrop-blur-sm rounded-xl p-3 border border-orange-300/30 hover:bg-orange-500/30 transition-all duration-300">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center">
-                        <Timer className="w-5 h-5 text-orange-300 mr-2" />
-                        <span className="text-orange-200 text-sm font-semibold">Temps</span>
-                      </div>
-                      {/* Dans la section "Temps restant" */}
-                      <h3 className="text-white font-bold text-xl">
+                    <div className="flex items-center justify-center">
+                      <Timer className="w-5 h-5 text-orange-300 mr-2" />
+                      <span className="text-white font-bold text-xl">
                         {formatTimer(currentPhaseState?.timeRemaining || 0)}
-                      </h3>
-                    </div>
-                    {/* Progress Bar */}
-                    <div className="relative">
-                      <div className="bg-white/20 rounded-full h-3 overflow-hidden">
-                        <div
-                          className="h-3 rounded-full transition-all duration-1000 bg-gradient-to-r from-green-400 to-red-500"
-                          style={{
-                            width: currentPhaseState?.timer
-                              ? `${Math.max(
-                                  0,
-                                  Math.min(
-                                    100,
-                                    (((currentPhaseState.timer ?? 0) - (currentPhaseState.timeRemaining ?? 0)) /
-                                      (currentPhaseState.timer ?? 1)) *
-                                      100
-                                  )
-                                )}%`
-                              : '0%',
-                          }}
-                        ></div>
-                      </div>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -336,7 +303,8 @@ function RoomCreated() {
           </div>
         </div>
       )}
-      {/* Main Game Area: grille fixe 5 colonnes, Rouge gauche / Centre / Bleue droite */}
+
+      {/* Main Game Area: grille fixe 5 colonnes */}
       <main className="relative z-10 px-6 pb-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-5 gap-6 items-start">
@@ -349,7 +317,7 @@ function RoomCreated() {
                   </div>
                 </div>
 
-                {/* Sage */}
+                {/* Sage Rouge */}
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-3">
                     <h4 className="text-white/90 text-sm font-semibold flex items-center">
@@ -375,7 +343,7 @@ function RoomCreated() {
                   </div>
                 </div>
 
-                {/* Disciples */}
+                {/* Disciples Rouges */}
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-3">
                     <h4 className="text-white/90 text-sm font-semibold flex items-center">
@@ -401,13 +369,18 @@ function RoomCreated() {
                       redTeam
                         .filter((user) => user.role === 'disciple')
                         .map((disciple) => (
-                          <div key={(disciple as any).userToken ?? (disciple as any).id}>{renderUserCard(disciple)}</div>
+                          <div key={(disciple as any).userToken ?? (disciple as any).id}>
+                            {renderUserCard(disciple)}
+                          </div>
                         ))
                     )}
                   </div>
                 </div>
               </div>
-              {/* Center Columns: Game Area */}
+            </div>
+
+            {/* Colonne centrale: Zone de jeu + Champ de saisie unique */}
+            <div className="col-span-3">
               {/* Champ de saisie au-dessus de la zone de jeu */}
               <form
                 onSubmit={(e) => {
@@ -436,233 +409,142 @@ function RoomCreated() {
                 </div>
               </form>
 
-              {/* Zone de jeu */}
+              {/* Zone de jeu (contenu central minimal, sans doublons de timer/progress) */}
               <div className={panel}>
-                {/* Proposal Input */}
-                <div className="max-w-[520px] mx-auto mb-6">
-                  <div className="w-full px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-white font-semibold transition-all duration-300 mb-4">
-                    <div className="flex items-center justify-center">
+                <div className="max-w-[720px] mx-auto">
+                  <div className="text-white/80 text-sm">
+                    {/* Affichage simple du temps restant */}
+                    <div className="flex items-center justify-center mb-4">
+                      <Timer className="w-5 h-5 text-orange-300 mr-2" />
                       <span className="text-white font-bold text-lg">
                         {formatTimer(currentPhaseState?.timeRemaining || 0)}
                       </span>
                     </div>
-                    <div className="relative mt-3">
-                      <div className="bg-white/20 rounded-full h-3 overflow-hidden">
-                        <div
-                          className="h-3 rounded-full transition-all duration-1000 bg-gradient-to-r from-green-400 to-red-500"
-                          style={{
-                            width: currentPhaseState?.timer
-                              ? `${Math.max(
-                                  0,
-                                  Math.min(
-                                    100,
-                                    (((currentPhaseState.timer ?? 0) - (currentPhaseState.timeRemaining ?? 0)) /
-                                      (currentPhaseState.timer ?? 1)) *
-                                      100
-                                  )
-                                )}%`
-                              : '0%',
-                          }}
-                        ></div>
-                      </div>
+                    {/* Placeholder pour le contenu de jeu */}
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center">
+                      Aire de jeu
                     </div>
                   </div>
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      sendProposal();
-                    }}
-                    className="mb-6"
-                  >
-                    <div className={panelTight}>
-                      <div className="flex items-center space-x-3">
-                        <input
-                          type="text"
-                          value={proposal}
-                          onChange={(e) => setProposal(e.target.value)}
-                          placeholder="Tapez votre réponse..."
-                          className="flex-1 px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-semibold focus:bg-white/30 transition-all duration-300"
-                        />
-                        <button
-                          type="submit"
-                          disabled={!proposal.trim()}
-                          className="bg-green-500/80 backdrop-blur-sm hover:bg-green-600 text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 hover:scale-105 disabled:opacity-50"
-                        >
-                          <Check className="w-5 h-5" />
-                        </button>
+
+                  {/* Historique simple */}
+                  <div className="mt-6">
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                      <div className="flex items-center mb-3">
+                        <History className="w-5 h-5 text-white/70 mr-2" />
+                        <span className="text-white font-semibold">Historique</span>
                       </div>
-                    </div>
-                  </form>
-
-                  {/* Historique */}
-                  <div className={`${panel} mt-6`}>
-                    {/* Proposal Input */}
-                    <div className="max-w-[520px] mx-auto mb-6">
-                      <div className="w-full px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-white font-semibold transition-all duration-300 mb-4">
-                        <div className="flex items-center justify-center">
-                          <span className="text-white font-bold text-lg">
-                            {formatTimer(currentPhaseState?.timeRemaining || 0)}
-                          </span>
-                        </div>
-                        <div className="relative mt-3">
-                          <div className="bg-white/20 rounded-full h-3 overflow-hidden">
-                            <div
-                              className="h-3 rounded-full transition-all duration-1000 bg-gradient-to-r from-green-400 to-red-500"
-                              style={{
-                                width: currentPhaseState?.timer
-                                  ? `${Math.max(
-                                      0,
-                                      Math.min(
-                                        100,
-                                        (((currentPhaseState.timer ?? 0) - (currentPhaseState.timeRemaining ?? 0)) /
-                                          (currentPhaseState.timer ?? 1)) *
-                                          100
-                                      )
-                                    )}%`
-                                : '0%',
-                            }}
-                          ></div>
-                        </div>
-                      </div>
-
-                      <form
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          sendProposal();
-                        }}
-                        className="mb-6"
-                      >
-                        <div className={panelTight}>
-                          <div className="flex items-center space-x-3">
-                            <input
-                              type="text"
-                              value={proposal}
-                              onChange={(e) => setProposal(e.target.value)}
-                              placeholder="Tapez votre réponse..."
-                              className="flex-1 px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-semibold focus:bg-white/30 transition-all duration-300"
-                            />
-                            <button
-                              type="submit"
-                              disabled={!proposal.trim()}
-                              className="bg-green-500/80 backdrop-blur-sm hover:bg-green-600 text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 hover:scale-105 disabled:opacity-50"
-                            >
-                              <Check className="w-5 h-5" />
-                            </button>
-                          </div>
-                        </div>
-                      </form>
-
-                      {/* Right Column: Équipe Bleue + Spectateurs */}
-                      <div className="col-span-1">
-                        {/* Équipe Bleue */}
-                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:bg-white/15 transition-all duration-300">
-                          <div className="text-center mb-6">
-                            <div className="bg-blue-500/20 backdrop-blur-sm px-6 py-3 rounded-full border border-blue-300/30 inline-block hover:bg-blue-500/30 transition-all duration-300">
-                              <h3 className="text-blue-200 font-bold text-lg tracking-wide">ÉQUIPE BLEUE</h3>
-                            </div>
-                          </div>
-
-                          {/* Sage */}
-                          <div className="mb-6">
-                            <div className="flex items-center justify-between mb-3">
-                              <h4 className="text-white/90 text-sm font-semibold flex items-center">
-                                <Crown className="w-4 h-4 mr-2 text-yellow-400" />
-                                Sage
-                              </h4>
-                              {(!currentUser.team || currentUser.team === 'spectator') && (
-                                <button
-                                  onClick={() => joinTeam('blue', 'sage')}
-                                  disabled={isJoiningTeam}
-                                  className="bg-yellow-500/20 hover:bg-yellow-500/40 text-yellow-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-yellow-300/30 hover:border-yellow-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                  {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
-                                </button>
-                              )}
-                            </div>
-                            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                              {blueSage ? (
-                                renderUserCard(blueSage)
-                              ) : (
-                                <div className="text-center text-white/60 text-sm py-4">Aucun Sage assigné</div>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Disciples */}
-                          <div>
-                            <div className="flex items-center justify-between mb-3">
-                              <h4 className="text-white/90 text-sm font-semibold flex items-center">
-                                <Users className="w-4 h-4 mr-2 text-blue-400" />
-                                Disciples
-                              </h4>
-                              {(!currentUser.team || currentUser.team === 'spectator') && (
-                                <button
-                                  onClick={() => joinTeam('blue', 'disciple')}
-                                  disabled={isJoiningTeam}
-                                  className="bg-blue-500/20 hover:bg-blue-500/40 text-blue-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-blue-300/30 hover:border-blue-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                  {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
-                                </button>
-                              )}
-                            </div>
-                            <div className="space-y-3">
-                              {blueTeam
-                                .filter((user) => user.role === 'disciple')
-                                .map((disciple) => (
-                                  <div key={(disciple as any).userToken ?? (disciple as any).id}>
-                                    {renderUserCard(disciple)}
-                                  </div>
-                                ))}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Spectateurs */}
-                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:bg-white/15 transition-all duration-300">
-                          <div className="text-center mb-6">
-                            <div className="bg-gray-500/20 backdrop-blur-sm px-6 py-3 rounded-full border border-gray-300/30 inline-block hover:bg-gray-500/30 transition-all duration-300">
-                              <h3 className="text-gray-200 font-bold text-lg tracking-wide">SPECTATEURS</h3>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center justify-between mb-3">
-                            <h4 className="text-white/90 text-sm font-semibold flex items-center">
-                              <Eye className="w-4 h-4 mr-2 text-gray-400" />
-                              Observateurs
-                            </h4>
-                            {/* Bouton toujours visible, simplement désactivé si déjà spectateur */}
-                            <button
-                              onClick={joinSpectator}
-                              disabled={isJoiningTeam || currentUser.team === 'spectator'}
-                              className="bg-gray-500/20 hover:bg-gray-500/40 text-gray-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-gray-300/30 hover:border-gray-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
-                            </button>
-                          </div>
-
-                          <div className="space-y-3">
-                            {spectators.length === 0 ? (
-                              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 opacity-50">
-                                <div className="text-center text-white/60 text-sm py-2">Aucun spectateur</div>
-                              </div>
-                            ) : (
-                              spectators.map((spectator) => (
-                                <div key={(spectator as any).userToken ?? (spectator as any).id}>
-                                  {renderUserCard(spectator)}
-                                </div>
-                              ))
-                            )}
-                          </div>
-                        </div>
+                      <div className="text-white/70 text-sm">
+                        {/* Liste historique (placeholder). Utiliser historyEndRef si nécessaire */}
+                        <div ref={historyEndRef}></div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Colonne droite: ÉQUIPE BLEUE + SPECTATEURS */}
+            <div className="col-span-1">
+              {/* ÉQUIPE BLEUE */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:bg-white/15 transition-all duration-300">
+                <div className="text-center mb-6">
+                  <div className="bg-blue-500/20 backdrop-blur-sm px-6 py-3 rounded-full border border-blue-300/30 inline-block hover:bg-blue-500/30 transition-all duration-300">
+                    <h3 className="text-blue-200 font-bold text-lg tracking-wide">ÉQUIPE BLEUE</h3>
+                  </div>
+                </div>
+
+                {/* Sage Bleu */}
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-white/90 text-sm font-semibold flex items-center">
+                      <Crown className="w-4 h-4 mr-2 text-yellow-400" />
+                      Sage
+                    </h4>
+                    {(!currentUser.team || currentUser.team === 'spectator') && (
+                      <button
+                        onClick={() => joinTeam('blue', 'sage')}
+                        disabled={isJoiningTeam}
+                        className="bg-yellow-500/20 hover:bg-yellow-500/40 text-yellow-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-yellow-300/30 hover:border-yellow-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
+                      </button>
+                    )}
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                    {blueSage ? (
+                      renderUserCard(blueSage)
+                    ) : (
+                      <div className="text-center text-white/60 text-sm py-4">Aucun Sage assigné</div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Disciples Bleus */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-white/90 text-sm font-semibold flex items-center">
+                      <Users className="w-4 h-4 mr-2 text-blue-400" />
+                      Disciples
+                    </h4>
+                    {(!currentUser.team || currentUser.team === 'spectator') && (
+                      <button
+                        onClick={() => joinTeam('blue', 'disciple')}
+                        disabled={isJoiningTeam}
+                        className="bg-blue-500/20 hover:bg-blue-500/40 text-blue-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-blue-300/30 hover:border-blue-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
+                      </button>
+                    )}
+                  </div>
+                  <div className="space-y-3">
+                    {blueTeam
+                      .filter((user) => user.role === 'disciple')
+                      .map((disciple) => (
+                        <div key={(disciple as any).userToken ?? (disciple as any).id}>{renderUserCard(disciple)}</div>
+                      ))}
+                  </div>
+                </div>
               </div>
+
+              {/* SPECTATEURS */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:bg-white/15 transition-all duration-300 mt-6">
+                <div className="text-center mb-6">
+                  <div className="bg-gray-500/20 backdrop-blur-sm px-6 py-3 rounded-full border border-gray-300/30 inline-block hover:bg-gray-500/30 transition-all duration-300">
+                    <h3 className="text-gray-200 font-bold text-lg tracking-wide">SPECTATEURS</h3>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-white/90 text-sm font-semibold flex items-center">
+                    <Eye className="w-4 h-4 mr-2 text-gray-400" />
+                    Observateurs
+                  </h4>
+                  <button
+                    onClick={joinSpectator}
+                    disabled={isJoiningTeam || currentUser.team === 'spectator'}
+                    className="bg-gray-500/20 hover:bg-gray-500/40 text-gray-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-gray-300/30 hover:border-gray-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {spectators.length === 0 ? (
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 opacity-50">
+                      <div className="text-center text-white/60 text-sm py-2">Aucun spectateur</div>
+                    </div>
+                  ) : (
+                    spectators.map((spectator) => (
+                      <div key={(spectator as any).userToken ?? (spectator as any).id}>{renderUserCard(spectator)}</div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </main>
+
       {/* Reset Modal */}
       {showResetModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -691,4 +573,5 @@ function RoomCreated() {
     </div>
   );
 }
+
 export default RoomCreated;

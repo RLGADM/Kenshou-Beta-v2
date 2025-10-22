@@ -339,19 +339,21 @@ const RoomCreated: React.FC = () => {
         </div>
       )}
       {/* Main Game Area */}
-      // Colonnes principales: ancien style pour les panneaux et en-têtes d’équipes
       <main className="relative z-10 px-6 pb-8">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-5 gap-6">
-            {/* Colonne gauche - Équipe Rouge */}
-            <div className="sm:col-span-1">
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:bg-white/15 transition-all duration-300">
+          {/* Fix: grille toujours active et 5 colonnes */}
+          <div className="grid grid-cols-5 gap-6">
+            {/* Colonne gauche: encapsuler TOUT le contenu */}
+            <div className="col-span-1">
+              {/* En-tête équipe rouge */}
+              <div className={panel}>
                 <div className="text-center mb-6">
-                  <div className="bg-red-500/20 backdrop-blur-sm px-6 py-3 rounded-full border border-red-300/30 inline-block hover:bg-red-500/30 transition-all duration-300">
+                  <div className="bg-red-700/20 backdrop-blur-sm px-6 py-3 rounded-full border border-red-600 inline-block">
                     <h3 className="text-red-200 font-bold text-lg tracking-wide">ÉQUIPE ROUGE</h3>
                   </div>
                 </div>
               </div>
+
               {/* Sage */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-3">

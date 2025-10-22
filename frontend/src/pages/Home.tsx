@@ -9,11 +9,11 @@ import GameConfigModal from '@/components/GameConfigModal';
 // Déclaration via hooks
 import { useHomeHandlers } from '@/hooks';
 // Import logo (chemin public pour éviter 404 en prod)
-const logo = '/logo.png';
+import logo from '../assets/logo.png';
 
 // Déclaration const
 
-const Home: React.FC = () => {
+function Home() {
   // Déclaration const locales
   const storedUsername = localStorage.getItem('lastUsername');
   const initialUsername = storedUsername ? JSON.parse(storedUsername) : '';
@@ -61,6 +61,21 @@ const Home: React.FC = () => {
     }
   }, []);
 
+  const [useFallbackLogo, setUseFallbackLogo] = useState(false);
+  const fallbackLogo =
+    'data:image/svg+xml;utf8,' +
+    encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
+              <defs>
+                  <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+                      <stop offset="0%" stop-color="#4f46e5"/>
+                      <stop offset="100%" stop-color="#a855f7"/>
+                  </linearGradient>
+              </defs>
+              <rect width="80" height="80" rx="12" fill="url(#g)"/>
+              <text x="50%" y="55%" font-family="Montserrat, sans-serif" font-size="34" font-weight="800" fill="#fff" text-anchor="middle">K</text>
+          </svg>`
+    );
   return (
     <div
       className="min-h-screen relative overflow-hidden"
@@ -191,23 +206,6 @@ const Home: React.FC = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Home;
-
-// Fallback si le logo public est manquant en prod
-const [useFallbackLogo, setUseFallbackLogo] = useState(false);
-const fallbackLogo =
-    'data:image/svg+xml;utf8,' +
-    encodeURIComponent(
-        `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
-            <defs>
-                <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-                    <stop offset="0%" stop-color="#4f46e5"/>
-                    <stop offset="100%" stop-color="#a855f7"/>
-                </linearGradient>
-            </defs>
-            <rect width="80" height="80" rx="12" fill="url(#g)"/>
-            <text x="50%" y="55%" font-family="Montserrat, sans-serif" font-size="34" font-weight="800" fill="#fff" text-anchor="middle">K</text>
-        </svg>`
-    );

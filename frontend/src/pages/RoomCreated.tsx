@@ -28,11 +28,18 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 
 // --------------- Composant RoomCreated refactorisé
+// Dans le composant RoomCreated (déclaration des styles classiques)
 const RoomCreated: React.FC = () => {
   // intégration useParams et useState
   const { roomCode: routeRoomCode } = useParams();
   const [tempUsername, setTempUsername] = useState('');
   const navigate = useNavigate();
+
+  // Ancien design: constantes de style (classes Tailwind)
+  const panel = 'bg-slate-800 rounded-xl p-6 shadow-md border border-slate-700';
+  const panelTight = 'bg-slate-800 rounded-xl p-4 shadow-md border border-slate-700';
+  const chip = 'bg-slate-700 px-4 py-2 rounded-full border border-slate-600';
+  const btnGhost = 'bg-slate-700 hover:bg-slate-600 border border-slate-600 text-white';
 
   // Hook principal qui gère toute la logique
   const {
@@ -178,22 +185,19 @@ const RoomCreated: React.FC = () => {
           </div>
         </div>
       )}
-
       {/* Animated Background Pattern */}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22 fill-rule=%22evenodd%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%220.05%22%3E%3Cpath d=%22m36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2V6h4V4h-4zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] animate-pulse opacity-5 pointer-events-none"></div>
-
       {/* Error Toast */}
       {teamJoinError && (
         <div className="fixed top-4 right-4 z-50 bg-red-500 text-white px-6 py-3 rounded-xl shadow-lg">
           {teamJoinError}
         </div>
       )}
-
       {/* Header */}
+      // Header: remplace les blocs "chip" et le bouton copier par l'ancien style
       <header className="relative z-10 p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
-            {/* Left Side - Game Title and Room Info */}
             <div className="flex items-center space-x-4">
               <h1
                 className="text-white text-3xl font-black tracking-wider"
@@ -201,7 +205,7 @@ const RoomCreated: React.FC = () => {
               >
                 KENSHO
               </h1>
-              <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30">
+              <div className={chip}>
                 <span className="text-white text-sm font-semibold">
                   Salon : <span className="text-yellow-300 font-bold">{currentRoom.code}</span>
                 </span>
@@ -209,12 +213,12 @@ const RoomCreated: React.FC = () => {
               <button
                 onClick={copyRoomLink}
                 disabled={!currentRoom.code}
-                className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 border border-white/30 flex items-center space-x-2 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                className={`${btnGhost} px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-2 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 <span>{copied ? 'Copié !' : "Copier l'URL"}</span>
               </button>
-              <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30">
+              <div className={chip}>
                 <span className="text-white text-sm font-semibold">
                   <Users className="w-4 h-4 inline mr-1" />
                   {currentRoom.users.length} joueurs
@@ -253,8 +257,8 @@ const RoomCreated: React.FC = () => {
           </div>
         </div>
       </header>
-
       {/* Status Bar */}
+      // Barre de statut: remplace les wrappers par le style classique
       {gameState && (
         <div className="relative z-10 px-6 mb-6">
           <div className="max-w-7xl mx-auto">
@@ -334,13 +338,12 @@ const RoomCreated: React.FC = () => {
           </div>
         </div>
       )}
-
       {/* Main Game Area */}
+      // Colonnes principales: ancien style pour les panneaux et en-têtes d’équipes
       <main className="relative z-10 px-6 pb-8">
         <div className="max-w-7xl mx-auto">
-          {/* Active le layout en 5 colonnes dès 640px */}
           <div className="grid grid-cols-1 sm:grid-cols-5 gap-6">
-            {/* Left Column: Équipe Rouge */}
+            {/* Colonne gauche - Équipe Rouge */}
             <div className="sm:col-span-1">
               <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:bg-white/15 transition-all duration-300">
                 <div className="text-center mb-6">
@@ -673,7 +676,6 @@ const RoomCreated: React.FC = () => {
           </div>
         </div>
       </main>
-
       {/* Reset Modal */}
       {showResetModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">

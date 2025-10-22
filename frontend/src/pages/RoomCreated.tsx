@@ -92,11 +92,20 @@ function RoomCreated() {
   const currentRoundState = gameState?.rounds?.[gameState.currentRound];
   const currentPhaseIndex = currentRoundState?.currentPhase ?? 0;
   const currentPhaseState = currentRoundState?.phases?.[currentPhaseIndex];
+  // Listes d'équipe et rôles déjà dérivées
   const redTeam = currentRoom?.users?.filter((user: User) => user.team === 'red') ?? [];
   const blueTeam = currentRoom?.users?.filter((user: User) => user.team === 'blue') ?? [];
-  const spectators = currentRoom?.users?.filter((user: User) => user.team === 'spectator') ?? [];
   const redSage = redTeam.find((u: User) => u.role === 'sage');
   const blueSage = blueTeam.find((u: User) => u.role === 'sage');
+
+  // Helpers d'affichage pour les boutons d'équipe (corrige le ReferenceError)
+  const userTeam = typeof currentUser?.team === 'string' ? currentUser.team : null;
+  const canJoinRed = !isJoiningTeam && userTeam !== 'red';
+  const canJoinBlue = !isJoiningTeam && userTeam !== 'blue';
+  const joinLabel = userTeam ? 'Changer' : 'Rejoindre';
+  const spectators = currentRoom?.users?.filter((user: User) => user.team === 'spectator') ?? [];
+  //onst redSage = redTeam.find((u: User) => u.role === 'sage');
+  //onst blueSage = blueTeam.find((u: User) => u.role === 'sage');
 
   // Modal: calcul du modal pseudo uniquement si nécessaire
   const storedUsername =
@@ -115,15 +124,14 @@ function RoomCreated() {
   // Fonction de rendu d'une carte utilisateur
   const renderUserCard = (user: User) => {
     const cardData = getUserCardData(user, currentUser.userToken);
+    const avatarColor = cardData.teamColor === 'red' ? 'rose' : cardData.teamColor;
     return (
       <div
         className={`${cardData.bgColor} backdrop-blur-sm rounded-xl p-4 border hover:bg-opacity-30 transition-all duration-300 ${cardData.highlight}`}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div
-              className={`w-10 h-10 bg-${cardData.teamColor}-500 rounded-full flex items-center justify-center shadow-lg`}
-            >
+            <div className={`w-10 h-10 bg-${avatarColor}-500 rounded-full flex items-center justify-center shadow-lg`}>
               <span className="text-white font-bold">{user.username.charAt(0).toUpperCase()}</span>
             </div>
             <div>
@@ -260,29 +268,50 @@ function RoomCreated() {
                 {/* Phase de jeu */}
                 <div className="col-span-1">
                   <div className="bg-blue-500/20 backdrop-blur-sm rounded-xl p-3 border border-blue-300/30 text-center hover:bg-blue-500/30 transition-all duration-300">
-                    <div className="flex items-center justify-center mb-2">
+                    <div className="flex flex-col items-center mb-2">
                       <button
                         onClick={isGameActive ? pauseGame : startGame}
                         disabled={!permissions.canControlGame}
-                        className="text-blue-300 hover:text-white transition-colors flex items-center justify-center mr-2"
+                        className="text-blue-200 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-300/30 px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50"
                       >
-                        {isGameActive ? <PauseCircle className="w-5 h-5" /> : <PlayCircle className="w-5 h-5" />}
+                        {isGameActive ? 'Pause' : 'Jouer'}
                       </button>
-                      <span className="text-blue-200 text-sm font-semibold">Phase</span>
+                      <span className="text-blue-200 text-sm font-semibold mt-2">Phase</span>
                     </div>
                     <h3 className="text-white font-bold text-sm">
                       {currentPhaseIndex === 0 ? 'En attente' : `Phase ${currentPhaseIndex}`}
                     </h3>
                   </div>
                 </div>
-                {/* Temps restant (affichage simple, sans barre de progression) */}
+                {/* Temps restant (affichage + barre de progression) */}
                 <div className="col-span-2">
                   <div className="bg-orange-500/20 backdrop-blur-sm rounded-xl p-3 border border-orange-300/30 hover:bg-orange-500/30 transition-all duration-300">
-                    <div className="flex items-center justify-center">
+                    <div className="flex items-center justify-center mb-2">
                       <Timer className="w-5 h-5 text-orange-300 mr-2" />
                       <span className="text-white font-bold text-xl">
                         {formatTimer(currentPhaseState?.timeRemaining || 0)}
                       </span>
+                    </div>
+                    {/* Progress Bar */}
+                    <div className="relative">
+                      <div className="bg-white/20 rounded-full h-3 overflow-hidden">
+                        <div
+                          className="h-3 rounded-full transition-all duration-1000 bg-gradient-to-r from-green-400 to-red-500"
+                          style={{
+                            width: currentPhaseState?.timer
+                              ? `${Math.max(
+                                  0,
+                                  Math.min(
+                                    100,
+                                    (((currentPhaseState.timer ?? 0) - (currentPhaseState.timeRemaining ?? 0)) /
+                                      (currentPhaseState.timer ?? 1)) *
+                                      100
+                                  )
+                                )}%`
+                              : '0%',
+                          }}
+                        ></div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -312,8 +341,8 @@ function RoomCreated() {
             <div className="col-span-1">
               <div className={panel}>
                 <div className="text-center mb-6">
-                  <div className="bg-red-700/20 backdrop-blur-sm px-6 py-3 rounded-full border border-red-600 inline-block">
-                    <h3 className="text-red-200 font-bold text-lg tracking-wide">ÉQUIPE ROUGE</h3>
+                  <div className="bg-rose-700/20 backdrop-blur-sm px-6 py-3 rounded-full border border-rose-600 inline-block">
+                    <h3 className="text-rose-200 font-bold text-lg tracking-wide">ÉQUIPE ROUGE</h3>
                   </div>
                 </div>
 
@@ -324,13 +353,13 @@ function RoomCreated() {
                       <Crown className="w-4 h-4 mr-2 text-yellow-400" />
                       Sage
                     </h4>
-                    {(!currentUser.team || currentUser.team === 'spectator') && (
+                    {canJoinRed && (
                       <button
                         onClick={() => joinTeam('red', 'sage')}
                         disabled={isJoiningTeam}
                         className="bg-yellow-500/20 hover:bg-yellow-500/40 text-yellow-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-yellow-300/30 hover:border-yellow-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
+                        {isJoiningTeam ? 'En cours...' : joinLabel}
                       </button>
                     )}
                   </div>
@@ -350,13 +379,13 @@ function RoomCreated() {
                       <Users className="w-4 h-4 mr-2 text-blue-400" />
                       Disciples
                     </h4>
-                    {(!currentUser.team || currentUser.team === 'spectator') && (
+                    {canJoinRed && (
                       <button
                         onClick={() => joinTeam('red', 'disciple')}
                         disabled={isJoiningTeam}
                         className="bg-blue-500/20 hover:bg-blue-500/40 text-blue-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-blue-300/30 hover:border-blue-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
+                        {isJoiningTeam ? 'En cours...' : joinLabel}
                       </button>
                     )}
                   </div>
@@ -460,13 +489,13 @@ function RoomCreated() {
                       <Crown className="w-4 h-4 mr-2 text-yellow-400" />
                       Sage
                     </h4>
-                    {(!currentUser.team || currentUser.team === 'spectator') && (
+                    {canJoinBlue && (
                       <button
                         onClick={() => joinTeam('blue', 'sage')}
                         disabled={isJoiningTeam}
                         className="bg-yellow-500/20 hover:bg-yellow-500/40 text-yellow-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-yellow-300/30 hover:border-yellow-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
+                        {isJoiningTeam ? 'En cours...' : joinLabel}
                       </button>
                     )}
                   </div>
@@ -486,13 +515,13 @@ function RoomCreated() {
                       <Users className="w-4 h-4 mr-2 text-blue-400" />
                       Disciples
                     </h4>
-                    {(!currentUser.team || currentUser.team === 'spectator') && (
+                    {canJoinBlue && (
                       <button
                         onClick={() => joinTeam('blue', 'disciple')}
                         disabled={isJoiningTeam}
                         className="bg-blue-500/20 hover:bg-blue-500/40 text-blue-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-blue-300/30 hover:border-blue-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
+                        {isJoiningTeam ? 'En cours...' : joinLabel}
                       </button>
                     )}
                   </div>

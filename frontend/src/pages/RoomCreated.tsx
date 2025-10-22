@@ -30,7 +30,7 @@ import { toast } from 'react-hot-toast';
 // --------------- Composant RoomCreated refactorisé
 // Dans le composant RoomCreated (déclaration des styles classiques)
 // Dans RoomCreated(), déclare les styles classiques pour cohérence
-const RoomCreated: React.FC = () => {
+function RoomCreated() {
   // intégration useParams et useState
   const { roomCode: routeRoomCode } = useParams();
   const [tempUsername, setTempUsername] = useState('');
@@ -194,8 +194,7 @@ const RoomCreated: React.FC = () => {
           {teamJoinError}
         </div>
       )}
-      {/* Header */}
-      // Header: remplace les blocs "chip" et le bouton copier par l'ancien style
+      {/* Header — supprime les lignes de texte commençant par //, ou utilise un vrai commentaire JSX si besoin */}
       <header className="relative z-10 p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
@@ -338,80 +337,79 @@ const RoomCreated: React.FC = () => {
           </div>
         </div>
       )}
-      // Main Game Area: grille fixe 5 colonnes, Rouge gauche / Centre / Bleue droite
+      {/* Main Game Area: grille fixe 5 colonnes, Rouge gauche / Centre / Bleue droite */}
       <main className="relative z-10 px-6 pb-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-5 gap-6 items-start">
-            {/* Colonne gauche: Équipe Rouge */}
+            {/* Colonne gauche: ÉQUIPE ROUGE */}
             <div className="col-span-1">
-              {/* En-tête équipe rouge */}
               <div className={panel}>
                 <div className="text-center mb-6">
                   <div className="bg-red-700/20 backdrop-blur-sm px-6 py-3 rounded-full border border-red-600 inline-block">
                     <h3 className="text-red-200 font-bold text-lg tracking-wide">ÉQUIPE ROUGE</h3>
                   </div>
                 </div>
-              </div>
-
-              {/* Sage */}
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-white/90 text-sm font-semibold flex items-center">
-                    <Crown className="w-4 h-4 mr-2 text-yellow-400" />
-                    Sage
-                  </h4>
-                  {(!currentUser.team || currentUser.team === 'spectator') && (
-                    <button
-                      onClick={() => joinTeam('red', 'sage')}
-                      disabled={isJoiningTeam}
-                      className="bg-yellow-500/20 hover:bg-yellow-500/40 text-yellow-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-yellow-300/30 hover:border-yellow-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
-                    </button>
-                  )}
+            
+                {/* Sage */}
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-white/90 text-sm font-semibold flex items-center">
+                      <Crown className="w-4 h-4 mr-2 text-yellow-400" />
+                      Sage
+                    </h4>
+                    {(!currentUser.team || currentUser.team === 'spectator') && (
+                      <button
+                        onClick={() => joinTeam('red', 'sage')}
+                        disabled={isJoiningTeam}
+                        className="bg-yellow-500/20 hover:bg-yellow-500/40 text-yellow-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-yellow-300/30 hover:border-yellow-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
+                      </button>
+                    )}
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                    {redSage ? (
+                      renderUserCard(redSage)
+                    ) : (
+                      <div className="text-center text-white/60 text-sm py-4">Aucun Sage assigné</div>
+                    )}
+                  </div>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                  {redSage ? (
-                    renderUserCard(redSage)
-                  ) : (
-                    <div className="text-center text-white/60 text-sm py-4">Aucun Sage assigné</div>
-                  )}
+            
+                {/* Disciples */}
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-white/90 text-sm font-semibold flex items-center">
+                      <Users className="w-4 h-4 mr-2 text-blue-400" />
+                      Disciples
+                    </h4>
+                    {(!currentUser.team || currentUser.team === 'spectator') && (
+                      <button
+                        onClick={() => joinTeam('red', 'disciple')}
+                        disabled={isJoiningTeam}
+                        className="bg-blue-500/20 hover:bg-blue-500/40 text-blue-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-blue-300/30 hover:border-blue-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
+                      </button>
+                    )}
+                  </div>
+                  <div className="space-y-3">
+                    {redTeam.filter((user) => user.role === 'disciple').length === 0 ? (
+                      <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 opacity-50">
+                        <div className="text-center text-white/60 text-sm py-2">Aucun disciple</div>
+                      </div>
+                    ) : (
+                      redTeam
+                        .filter((user) => user.role === 'disciple')
+                        .map((disciple) => (
+                          <div key={(disciple as any).userToken ?? (disciple as any).id}>{renderUserCard(disciple)}</div>
+                        ))
+                    )}
+                  </div>
                 </div>
-              </div>
-
-              {/* Disciples */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-white/90 text-sm font-semibold flex items-center">
-                    <Users className="w-4 h-4 mr-2 text-blue-400" />
-                    Disciples
-                  </h4>
-                  {(!currentUser.team || currentUser.team === 'spectator') && (
-                    <button
-                      onClick={() => joinTeam('red', 'disciple')}
-                      disabled={isJoiningTeam}
-                      className="bg-blue-500/20 hover:bg-blue-500/40 text-blue-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-blue-300/30 hover:border-blue-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
-                    </button>
-                  )}
-                </div>
-                <div className="space-y-3">
-                  {redTeam.filter((user) => user.role === 'disciple').length === 0 ? (
-                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 opacity-50">
-                      <div className="text-center text-white/60 text-sm py-2">Aucun disciple</div>
-                    </div>
-                  ) : (
-                    redTeam
-                      .filter((user) => user.role === 'disciple')
-                      .map((disciple) => (
-                        <div key={(disciple as any).userToken ?? (disciple as any).id}>{renderUserCard(disciple)}</div>
-                      ))
-                  )}
-                </div>
-              </div>
             </div>
             {/* Center Columns: Game Area */}
+            // Dans la colonne centre — remplace intégralement le bloc contenant formatTimer + progress bar
             <div className="col-span-3">
               {/* Proposal Input */}
               <div className="max-w-[520px] mx-auto mb-6">
@@ -442,7 +440,6 @@ const RoomCreated: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                // Nouveau champ de saisie (remplace l’ancien, sans timer)
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -469,6 +466,7 @@ const RoomCreated: React.FC = () => {
                     </div>
                   </div>
                 </form>
+            
                 {/* Zone de jeu */}
                 <div className={panel}>
                   {/* Proposal Input */}

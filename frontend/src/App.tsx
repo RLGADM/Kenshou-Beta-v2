@@ -111,16 +111,11 @@ const App: React.FC = () => {
         <Toaster position="top-center" />
         <KeepAlive serverUrl={SERVER_URL} />
         {/* rootage */}
-        <BrowserRouter
-            future={{
-                v7_startTransition: true,
-                v7_relativeSplatPath: true,
-            }}
-        >
+        <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/room/:roomCode" element={<RoomCreated />} />
           {/* <Route path="/demo" element={<DemoMode />} /> */}
-        </BrowserRouter>
+        </Routes>
       </SocketContext.Provider>
     </>
   );

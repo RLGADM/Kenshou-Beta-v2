@@ -409,7 +409,7 @@ function RoomCreated() {
                 </div>
             </div>
             {/* Center Columns: Game Area */}
-            // Dans la colonne centre — remplace intégralement le bloc contenant formatTimer + progress bar
+            {/* Dans la colonne centre — remplace intégralement le bloc contenant formatTimer + progress bar */}
             <div className="col-span-3">
               {/* Proposal Input */}
               <div className="max-w-[520px] mx-auto mb-6">

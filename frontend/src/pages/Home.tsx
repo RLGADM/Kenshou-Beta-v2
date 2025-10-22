@@ -1,7 +1,7 @@
 // --------------- IMPORT
 
 // Déclaration import framework
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Plus, LogIn, Sparkles, Wifi } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 // Déclaration fichiers projets
@@ -93,7 +93,12 @@ const Home: React.FC = () => {
           <div className="text-center mb-6">
             <div className="relative mb-4">
               <div className="w-20 h-20 mx-auto flex items-center justify-center">
-                <img src={logo} alt="Kensho Logo" className="w-full h-full object-contain rounded-2xl shadow-lg" />
+                <img
+                  src={useFallbackLogo ? fallbackLogo : logo}
+                  onError={() => setUseFallbackLogo(true)}
+                  alt="Kensho Logo"
+                  className="w-full h-full object-contain rounded-2xl shadow-lg"
+                />
               </div>
               <div className="absolute -top-1 -right-1 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full p-1">
                 <Sparkles className="w-4 h-4 text-white" />
@@ -189,3 +194,20 @@ const Home: React.FC = () => {
 };
 
 export default Home;
+
+// Fallback si le logo public est manquant en prod
+const [useFallbackLogo, setUseFallbackLogo] = useState(false);
+const fallbackLogo =
+    'data:image/svg+xml;utf8,' +
+    encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
+            <defs>
+                <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#4f46e5"/>
+                    <stop offset="100%" stop-color="#a855f7"/>
+                </linearGradient>
+            </defs>
+            <rect width="80" height="80" rx="12" fill="url(#g)"/>
+            <text x="50%" y="55%" font-family="Montserrat, sans-serif" font-size="34" font-weight="800" fill="#fff" text-anchor="middle">K</text>
+        </svg>`
+    );

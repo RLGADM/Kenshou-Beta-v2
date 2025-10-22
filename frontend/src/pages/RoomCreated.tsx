@@ -29,6 +29,7 @@ import { toast } from 'react-hot-toast';
 
 // --------------- Composant RoomCreated refactorisé
 // Dans le composant RoomCreated (déclaration des styles classiques)
+// Dans RoomCreated(), déclare les styles classiques pour cohérence
 const RoomCreated: React.FC = () => {
   // intégration useParams et useState
   const { roomCode: routeRoomCode } = useParams();
@@ -265,6 +266,7 @@ const RoomCreated: React.FC = () => {
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-white/20">
               <div className="grid grid-cols-4 gap-4 items-center">
                 {/* Phase de jeu */}
+                // Colonne gauche et droite — remplacer sm:col-span-* par col-span-* pour la grille fixe
                 <div className="col-span-1">
                   <div className="bg-blue-500/20 backdrop-blur-sm rounded-xl p-3 border border-blue-300/30 text-center hover:bg-blue-500/30 transition-all duration-300">
                     <div className="flex items-center justify-center mb-2">
@@ -283,7 +285,6 @@ const RoomCreated: React.FC = () => {
                     </h3>
                   </div>
                 </div>
-
                 {/* Temps restant */}
                 <div className="col-span-2">
                   <div className="bg-orange-500/20 backdrop-blur-sm rounded-xl p-3 border border-orange-300/30 hover:bg-orange-500/30 transition-all duration-300">
@@ -320,7 +321,6 @@ const RoomCreated: React.FC = () => {
                     </div>
                   </div>
                 </div>
-
                 {/* Score */}
                 <div className="col-span-1">
                   <div className="bg-purple-500/20 backdrop-blur-sm rounded-xl p-3 border border-purple-300/30 text-center hover:bg-purple-500/30 transition-all duration-300">
@@ -338,12 +338,11 @@ const RoomCreated: React.FC = () => {
           </div>
         </div>
       )}
-      {/* Main Game Area */}
+      // Main Game Area: grille fixe 5 colonnes, Rouge gauche / Centre / Bleue droite
       <main className="relative z-10 px-6 pb-8">
         <div className="max-w-7xl mx-auto">
-          {/* Fix: grille toujours active et 5 colonnes */}
-          <div className="grid grid-cols-5 gap-6">
-            {/* Colonne gauche: encapsuler TOUT le contenu */}
+          <div className="grid grid-cols-5 gap-6 items-start">
+            {/* Colonne gauche: Équipe Rouge */}
             <div className="col-span-1">
               {/* En-tête équipe rouge */}
               <div className={panel}>
@@ -412,264 +411,295 @@ const RoomCreated: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Center Columns: Game Area */}
-          <div className="sm:col-span-3">
-            {/* Proposal Input */}
-            <div className="max-w-[520px] mx-auto mb-6">
-              <div className="w-full px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-white font-semibold transition-all duration-300 mb-4">
-                <div className="flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">
-                    {formatTimer(currentPhaseState?.timeRemaining || 0)}
-                  </span>
-                </div>
-                <div className="relative mt-3">
-                  <div className="bg-white/20 rounded-full h-3 overflow-hidden">
-                    <div
-                      className="h-3 rounded-full transition-all duration-1000 bg-gradient-to-r from-green-400 to-red-500"
-                      style={{
-                        width: currentPhaseState?.timer
-                          ? `${Math.max(
-                              0,
-                              Math.min(
-                                100,
-                                (((currentPhaseState.timer ?? 0) - (currentPhaseState.timeRemaining ?? 0)) /
-                                  (currentPhaseState.timer ?? 1)) *
-                                  100
-                              )
-                            )}%`
-                          : '0%',
-                      }}
-                    ></div>
+            {/* Center Columns: Game Area */}
+            // Section qui contenait ancien timer + input sous la balise "Center Columns: Game Area"
+            <div className="col-span-3">
+              {/* Proposal Input */}
+              <div className="max-w-[520px] mx-auto mb-6">
+                <div className="w-full px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-white font-semibold transition-all duration-300 mb-4">
+                  <div className="flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">
+                      {formatTimer(currentPhaseState?.timeRemaining || 0)}
+                    </span>
+                  </div>
+                  <div className="relative mt-3">
+                    <div className="bg-white/20 rounded-full h-3 overflow-hidden">
+                      <div
+                        className="h-3 rounded-full transition-all duration-1000 bg-gradient-to-r from-green-400 to-red-500"
+                        style={{
+                          width: currentPhaseState?.timer
+                            ? `${Math.max(
+                                0,
+                                Math.min(
+                                  100,
+                                  (((currentPhaseState.timer ?? 0) - (currentPhaseState.timeRemaining ?? 0)) /
+                                    (currentPhaseState.timer ?? 1)) *
+                                    100
+                                )
+                              )}%`
+                            : '0%',
+                        }}
+                      ></div>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  sendProposal();
-                }}
-                className="flex space-x-3"
-              >
-                <input
-                  type="text"
-                  value={proposal}
-                  onChange={(e) => setProposal(e.target.value)}
-                  placeholder="Tapez votre réponse..."
-                  className="flex-1 px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-semibold focus:bg-white/30 transition-all duration-300"
-                />
-                <button
-                  type="submit"
-                  disabled={!proposal.trim()}
-                  className="bg-green-500/80 backdrop-blur-sm hover:bg-green-600 text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 hover:scale-105 disabled:opacity-50"
+                // Nouveau champ de saisie (remplace l’ancien, sans timer)
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    sendProposal();
+                  }}
+                  className="mb-6"
                 >
-                  <Check className="w-5 h-5" />
-                </button>
-              </form>
-            </div>
-
-            {/* Game Area Split */}
-            {/* 2 colonnes dès 640px, sinon pile en 1 colonne */}
-            <div className="max-w-[940px] mx-auto">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {/* History */}
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 h-[600px] hover:bg-white/15 transition-all duration-300">
-                  <h3 className="text-white font-bold text-xl mb-4 flex items-center">
-                    <History className="w-6 h-6 mr-3 text-blue-400" />
-                    Historique
-                  </h3>
-
-                  <div
-                    className="space-y-3 h-[520px] overflow-y-auto"
-                    style={{
-                      scrollbarWidth: 'thin',
-                      scrollbarColor: 'rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1)',
-                    }}
-                  >
-                    {!currentRoom?.messages || currentRoom.messages.length === 0 ? (
-                      <div className="text-center text-white/60 py-12">
-                        <History className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                        <p className="text-lg font-medium mb-2">Aucun message pour le moment</p>
-                        <p className="text-sm">L'historique apparaîtra ici</p>
+                  <div className={panelTight}>
+                    <div className="flex items-center space-x-3">
+                      <input
+                        type="text"
+                        value={proposal}
+                        onChange={(e) => setProposal(e.target.value)}
+                        placeholder="Tapez votre réponse..."
+                        className="flex-1 px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                      />
+                      <button
+                        type="submit"
+                        disabled={!proposal.trim()}
+                        className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Check className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                </form>
+                {/* Zone de jeu */}
+                <div className={panel}>
+                  {/* Proposal Input */}
+                  <div className="max-w-[520px] mx-auto mb-6">
+                    <div className="w-full px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-white font-semibold transition-all duration-300 mb-4">
+                      <div className="flex items-center justify-center">
+                        <span className="text-white font-bold text-lg">
+                          {formatTimer(currentPhaseState?.timeRemaining || 0)}
+                        </span>
                       </div>
-                    ) : (
-                      currentRoom.messages.map((msg) => (
-                        <div
-                          key={msg.id}
-                          className="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20 hover:bg-white/20 transition-all duration-300"
-                        >
-                          <div className="flex items-start space-x-3">
-                            <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                              <Users className="w-3 h-3 text-white" />
-                            </div>
-                            <div className="flex-1">
-                              <p className="text-white text-sm font-medium">{msg.message}</p>
-                              <p className="text-white/60 text-xs mt-1">
-                                {formatTime(msg.timestamp)} - {msg.username}
-                              </p>
+                      <div className="relative mt-3">
+                        <div className="bg-white/20 rounded-full h-3 overflow-hidden">
+                          <div
+                            className="h-3 rounded-full transition-all duration-1000 bg-gradient-to-r from-green-400 to-red-500"
+                            style={{
+                              width: currentPhaseState?.timer
+                                ? `${Math.max(
+                                    0,
+                                    Math.min(
+                                      100,
+                                      (((currentPhaseState.timer ?? 0) - (currentPhaseState.timeRemaining ?? 0)) /
+                                        (currentPhaseState.timer ?? 1)) *
+                                        100
+                                    )
+                                  )}%`
+                                : '0%',
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        sendProposal();
+                      }}
+                      className="mb-6"
+                    >
+                      <div className={panelTight}>
+                        <div className="flex items-center space-x-3">
+                          <input
+                            type="text"
+                            value={proposal}
+                            onChange={(e) => setProposal(e.target.value)}
+                            placeholder="Tapez votre réponse..."
+                            className="flex-1 px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-semibold focus:bg-white/30 transition-all duration-300"
+                          />
+                          <button
+                            type="submit"
+                            disabled={!proposal.trim()}
+                            className="bg-green-500/80 backdrop-blur-sm hover:bg-green-600 text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 hover:scale-105 disabled:opacity-50"
+                          >
+                            <Check className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+
+                    {/* Historique */}
+                    <div className={`${panel} mt-6`}>
+                      {/* Proposal Input */}
+                      <div className="max-w-[520px] mx-auto mb-6">
+                        <div className="w-full px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-white font-semibold transition-all duration-300 mb-4">
+                          <div className="flex items-center justify-center">
+                            <span className="text-white font-bold text-lg">
+                              {formatTimer(currentPhaseState?.timeRemaining || 0)}
+                            </span>
+                          </div>
+                          <div className="relative mt-3">
+                            <div className="bg-white/20 rounded-full h-3 overflow-hidden">
+                              <div
+                                className="h-3 rounded-full transition-all duration-1000 bg-gradient-to-r from-green-400 to-red-500"
+                                style={{
+                                  width: currentPhaseState?.timer
+                                    ? `${Math.max(
+                                        0,
+                                        Math.min(
+                                          100,
+                                          (((currentPhaseState.timer ?? 0) - (currentPhaseState.timeRemaining ?? 0)) /
+                                            (currentPhaseState.timer ?? 1)) *
+                                            100
+                                        )
+                                      )}%`
+                                    : '0%',
+                                }}
+                              ></div>
                             </div>
                           </div>
                         </div>
-                      ))
-                    )}
-                    <div ref={historyEndRef} />
-                  </div>
-                </div>
 
-                {/* Game Interaction */}
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 h-[600px] flex flex-col hover:bg-white/15 transition-all duration-300">
-                  <h3 className="text-white font-bold text-xl mb-4 flex items-center">
-                    <Gamepad2 className="w-6 h-6 mr-3 text-purple-400" />
-                    Zone de jeu
-                  </h3>
-
-                  {/* Word Display */}
-                  <div className="mb-6">
-                    <div className="bg-gray-500/20 backdrop-blur-sm rounded-2xl p-6 border border-gray-300/30 text-center hover:bg-gray-500/30 transition-all duration-300">
-                      <div className="flex items-center justify-center mb-3">
-                        <Target className="w-8 h-8 text-gray-300 mr-3" />
-                        <span className="text-gray-200 text-lg font-semibold">En attente</span>
-                      </div>
-                      <h4 className="text-gray-400 font-bold text-3xl">---</h4>
-                    </div>
-                  </div>
-
-                  {/* Forbidden Words */}
-                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 mb-6 flex-1">
-                    <div className="flex items-center mb-3">
-                      <ShieldX className="w-5 h-5 text-red-300 mr-2" />
-                      <span className="text-white font-semibold">Mots interdits par l'équipe</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 h-full content-start">
-                      {/* Forbidden words will be added dynamically */}
-                    </div>
-                  </div>
-
-                  {/* Game Controls */}
-                  {permissions.canControlGame && (
-                    <div className="grid grid-cols-2 gap-3">
-                      <button
-                        onClick={startGame}
-                        disabled={isGameActive}
-                        className="bg-green-500/20 backdrop-blur-sm hover:bg-green-500/40 text-green-200 p-4 rounded-xl font-semibold transition-all duration-300 border border-green-300/30 flex items-center justify-center space-x-2 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <Play className="w-5 h-5" />
-                        <span>Commencer</span>
-                      </button>
-                      <button
-                        onClick={pauseGame}
-                        disabled={!isGameActive}
-                        className="bg-red-500/20 backdrop-blur-sm hover:bg-red-500/40 text-red-200 p-4 rounded-xl font-semibold transition-all duration-300 border border-red-300/30 flex items-center justify-center space-x-2 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <Pause className="w-5 h-5" />
-                        <span>Pause</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Right Column: Équipe Bleue + Spectateurs */}
-                <div className="sm:col-span-1">
-                  {/* Équipe Bleue */}
-                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:bg-white/15 transition-all duration-300">
-                    <div className="text-center mb-6">
-                      <div className="bg-blue-500/20 backdrop-blur-sm px-6 py-3 rounded-full border border-blue-300/30 inline-block hover:bg-blue-500/30 transition-all duration-300">
-                        <h3 className="text-blue-200 font-bold text-lg tracking-wide">ÉQUIPE BLEUE</h3>
-                      </div>
-                    </div>
-
-                    {/* Sage */}
-                    <div className="mb-6">
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-white/90 text-sm font-semibold flex items-center">
-                          <Crown className="w-4 h-4 mr-2 text-yellow-400" />
-                          Sage
-                        </h4>
-                        {(!currentUser.team || currentUser.team === 'spectator') && (
-                          <button
-                            onClick={() => joinTeam('blue', 'sage')}
-                            disabled={isJoiningTeam}
-                            className="bg-yellow-500/20 hover:bg-yellow-500/40 text-yellow-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-yellow-300/30 hover:border-yellow-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
-                          </button>
-                        )}
-                      </div>
-                      <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                        {blueSage ? (
-                          renderUserCard(blueSage)
-                        ) : (
-                          <div className="text-center text-white/60 text-sm py-4">Aucun Sage assigné</div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Disciples */}
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-white/90 text-sm font-semibold flex items-center">
-                          <Users className="w-4 h-4 mr-2 text-blue-400" />
-                          Disciples
-                        </h4>
-                        {(!currentUser.team || currentUser.team === 'spectator') && (
-                          <button
-                            onClick={() => joinTeam('blue', 'disciple')}
-                            disabled={isJoiningTeam}
-                            className="bg-blue-500/20 hover:bg-blue-500/40 text-blue-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-blue-300/30 hover:border-blue-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
-                          </button>
-                        )}
-                      </div>
-                      <div className="space-y-3">
-                        {blueTeam
-                          .filter((user) => user.role === 'disciple')
-                          .map((disciple) => (
-                            <div key={(disciple as any).userToken ?? (disciple as any).id}>
-                              {renderUserCard(disciple)}
+                        {/* Historique */}
+                        <div className={`${panel} mt-6`}>
+                          {/* Proposal Input */}
+                          <div className="max-w-[520px] mx-auto mb-6">
+                            <div className="w-full px-4 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-white font-semibold transition-all duration-300 mb-4">
+                              <div className="flex items-center justify-center">
+                                <span className="text-white font-bold text-lg">
+                                  {formatTimer(currentPhaseState?.timeRemaining || 0)}
+                                </span>
+                              </div>
+                              <div className="relative mt-3">
+                                <div className="bg-white/20 rounded-full h-3 overflow-hidden">
+                                  <div
+                                    className="h-3 rounded-full transition-all duration-1000 bg-gradient-to-r from-green-400 to-red-500"
+                                    style={{
+                                      width: currentPhaseState?.timer
+                                        ? `${Math.max(
+                                            0,
+                                            Math.min(
+                                              100,
+                                              (((currentPhaseState.timer ?? 0) -
+                                                (currentPhaseState.timeRemaining ?? 0)) /
+                                                (currentPhaseState.timer ?? 1)) *
+                                                100
+                                            )
+                                          )}%`
+                                        : '0%',
+                                    }}
+                                  ></div>
+                                </div>
+                              </div>
                             </div>
-                          ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Spectateurs */}
-                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:bg-white/15 transition-all duration-300">
-                    <div className="text-center mb-6">
-                      <div className="bg-gray-500/20 backdrop-blur-sm px-6 py-3 rounded-full border border-gray-300/30 inline-block hover:bg-gray-500/30 transition-all duration-300">
-                        <h3 className="text-gray-200 font-bold text-lg tracking-wide">SPECTATEURS</h3>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="text-white/90 text-sm font-semibold flex items-center">
-                        <Eye className="w-4 h-4 mr-2 text-gray-400" />
-                        Observateurs
-                      </h4>
-                      {/* Bouton toujours visible, simplement désactivé si déjà spectateur */}
-                      <button
-                        onClick={joinSpectator}
-                        disabled={isJoiningTeam || currentUser.team === 'spectator'}
-                        className="bg-gray-500/20 hover:bg-gray-500/40 text-gray-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-gray-300/30 hover:border-gray-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
-                      </button>
-                    </div>
-
-                    <div className="space-y-3">
-                      {spectators.length === 0 ? (
-                        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 opacity-50">
-                          <div className="text-center text-white/60 text-sm py-2">Aucun spectateur</div>
-                        </div>
-                      ) : (
-                        spectators.map((spectator) => (
-                          <div key={(spectator as any).userToken ?? (spectator as any).id}>
-                            {renderUserCard(spectator)}
                           </div>
-                        ))
-                      )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Column: Équipe Bleue + Spectateurs */}
+                    <div className="col-span-1">
+                      {/* Équipe Bleue */}
+                      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:bg-white/15 transition-all duration-300">
+                        <div className="text-center mb-6">
+                          <div className="bg-blue-500/20 backdrop-blur-sm px-6 py-3 rounded-full border border-blue-300/30 inline-block hover:bg-blue-500/30 transition-all duration-300">
+                            <h3 className="text-blue-200 font-bold text-lg tracking-wide">ÉQUIPE BLEUE</h3>
+                          </div>
+                        </div>
+
+                        {/* Sage */}
+                        <div className="mb-6">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-white/90 text-sm font-semibold flex items-center">
+                              <Crown className="w-4 h-4 mr-2 text-yellow-400" />
+                              Sage
+                            </h4>
+                            {(!currentUser.team || currentUser.team === 'spectator') && (
+                              <button
+                                onClick={() => joinTeam('blue', 'sage')}
+                                disabled={isJoiningTeam}
+                                className="bg-yellow-500/20 hover:bg-yellow-500/40 text-yellow-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-yellow-300/30 hover:border-yellow-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
+                              </button>
+                            )}
+                          </div>
+                          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                            {blueSage ? (
+                              renderUserCard(blueSage)
+                            ) : (
+                              <div className="text-center text-white/60 text-sm py-4">Aucun Sage assigné</div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Disciples */}
+                        <div>
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-white/90 text-sm font-semibold flex items-center">
+                              <Users className="w-4 h-4 mr-2 text-blue-400" />
+                              Disciples
+                            </h4>
+                            {(!currentUser.team || currentUser.team === 'spectator') && (
+                              <button
+                                onClick={() => joinTeam('blue', 'disciple')}
+                                disabled={isJoiningTeam}
+                                className="bg-blue-500/20 hover:bg-blue-500/40 text-blue-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-blue-300/30 hover:border-blue-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
+                              </button>
+                            )}
+                          </div>
+                          <div className="space-y-3">
+                            {blueTeam
+                              .filter((user) => user.role === 'disciple')
+                              .map((disciple) => (
+                                <div key={(disciple as any).userToken ?? (disciple as any).id}>
+                                  {renderUserCard(disciple)}
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Spectateurs */}
+                      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:bg-white/15 transition-all duration-300">
+                        <div className="text-center mb-6">
+                          <div className="bg-gray-500/20 backdrop-blur-sm px-6 py-3 rounded-full border border-gray-300/30 inline-block hover:bg-gray-500/30 transition-all duration-300">
+                            <h3 className="text-gray-200 font-bold text-lg tracking-wide">SPECTATEURS</h3>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-white/90 text-sm font-semibold flex items-center">
+                            <Eye className="w-4 h-4 mr-2 text-gray-400" />
+                            Observateurs
+                          </h4>
+                          {/* Bouton toujours visible, simplement désactivé si déjà spectateur */}
+                          <button
+                            onClick={joinSpectator}
+                            disabled={isJoiningTeam || currentUser.team === 'spectator'}
+                            className="bg-gray-500/20 hover:bg-gray-500/40 text-gray-200 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 border border-gray-300/30 hover:border-gray-300/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {isJoiningTeam ? 'En cours...' : 'Rejoindre'}
+                          </button>
+                        </div>
+
+                        <div className="space-y-3">
+                          {spectators.length === 0 ? (
+                            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 opacity-50">
+                              <div className="text-center text-white/60 text-sm py-2">Aucun spectateur</div>
+                            </div>
+                          ) : (
+                            spectators.map((spectator) => (
+                              <div key={(spectator as any).userToken ?? (spectator as any).id}>
+                                {renderUserCard(spectator)}
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -706,5 +736,4 @@ const RoomCreated: React.FC = () => {
     </div>
   );
 };
-
 export default RoomCreated;

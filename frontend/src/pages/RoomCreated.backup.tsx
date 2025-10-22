@@ -256,6 +256,7 @@ function RoomCreated() {
             </div>
           </div>
         </div>
+      </header>
       {/* Status Bar */}
       {/* Barre de statut: remplace les wrappers par le style classique */}
       {gameState && (

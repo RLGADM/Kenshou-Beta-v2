@@ -412,7 +412,6 @@ const RoomCreated: React.FC = () => {
               </div>
             </div>
             {/* Center Columns: Game Area */}
-            // Section qui contenait ancien timer + input sous la balise "Center Columns: Game Area"
             <div className="col-span-3">
               {/* Proposal Input */}
               <div className="max-w-[520px] mx-auto mb-6">
